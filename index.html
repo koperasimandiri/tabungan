@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tabungan Pelajar - SMP Negeri 4 Majenang</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --wood-dark: #241a13;
+        --wood-mid: #3a291d;
+        --paper: #F3ECDD;
+        --gold: #C9A227;
+        --gold-soft: #E4C766;
+        --maroon: #7A2331;
+        --forest: #1F4D3A;
+        --navy: #1B2A4A;
+        --muted: rgba(243, 236, 221, 0.55);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+        color: var(--paper);
+        background:
+            radial-gradient(ellipse 900px 500px at 50% -10%, rgba(228, 199, 102, 0.10), transparent 60%),
+            linear-gradient(180deg, var(--wood-mid) 0%, var(--wood-dark) 55%, #150f0a 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 1.5rem 5rem;
+        overflow-x: hidden;
+    }
+    .font-display { font-family: 'Fraunces', serif; }
+
+    .stage { width: 100%; max-width: 760px; text-align: center; }
+
+    h1 {
+        font-family: 'Fraunces', serif;
+        font-weight: 600;
+        font-size: clamp(1.8rem, 5vw, 2.5rem);
+        letter-spacing: -0.01em;
+        margin: 0;
+    }
+    .subtitle {
+        margin: 0.75rem auto 0;
+        max-width: 24ch;
+        color: var(--gold-soft);
+        font-family: 'Fraunces', serif;
+        font-size: clamp(2.25rem, 7vw, 3.4rem);
+        font-weight: 700;
+        line-height: 1.08;
+    }
+
+    .shelf {
+        margin-top: 4rem;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 2.25rem;
+        flex-wrap: wrap;
+        position: relative;
+    }
+    .shelf::after {
+        content: '';
+        position: absolute;
+        left: 6%;
+        right: 6%;
+        bottom: -0.6rem;
+        height: 1px;
+        background: linear-gradient(to right, transparent, rgba(201,162,39,0.45) 20%, rgba(201,162,39,0.45) 80%, transparent);
+    }
+
+    .passbook {
+        --tilt: 0deg;
+        position: relative;
+        width: 168px;
+        aspect-ratio: 3 / 4.3;
+        background:
+            linear-gradient(155deg, rgba(255,255,255,0.10), transparent 40%),
+            var(--cover);
+        border-radius: 5px 12px 12px 5px;
+        border: 1px solid rgba(243,236,221,0.14);
+        box-shadow:
+            inset -5px 0 0 rgba(0,0,0,0.22),
+            0 22px 34px -16px rgba(0,0,0,0.65);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.4rem 0.75rem 1.25rem;
+        text-decoration: none;
+        color: var(--paper);
+        cursor: pointer;
+        transform: rotate(var(--tilt)) translateY(0);
+        transform-origin: bottom center;
+        opacity: 0;
+        animation: settle 0.6s cubic-bezier(.22,1.4,.4,1) forwards;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        outline-offset: 4px;
+    }
+    .passbook:nth-child(1) { --cover: var(--maroon); --tilt: -5deg; animation-delay: 0.05s; }
+    .passbook:nth-child(2) { --cover: var(--forest); --tilt: 0deg;  animation-delay: 0.2s; z-index: 2; }
+    .passbook:nth-child(3) { --cover: var(--navy);   --tilt: 5deg;  animation-delay: 0.35s; }
+
+    .passbook.is-floating {
+        opacity: 1;
+        animation: floatBook 4.2s ease-in-out infinite;
+    }
+    .passbook:nth-child(1).is-floating { animation-delay: -1.2s; }
+    .passbook:nth-child(2).is-floating { animation-delay: -2.1s; }
+    .passbook:nth-child(3).is-floating { animation-delay: -0.6s; }
+
+    @keyframes floatBook {
+        0%, 100% { transform: rotate(var(--tilt)) translateY(0); }
+        50% { transform: rotate(var(--tilt)) translateY(-8px); }
+    }
+
+    .passbook:hover, .passbook:focus-visible {
+        transform: rotate(0deg) translateY(-12px);
+        box-shadow:
+            inset -5px 0 0 rgba(0,0,0,0.22),
+            0 30px 40px -14px rgba(0,0,0,0.6);
+    }
+
+    @keyframes settle {
+        0%   { opacity: 0; transform: rotate(var(--tilt)) translateY(28px); }
+        100% { opacity: 1; transform: rotate(var(--tilt)) translateY(0); }
+    }
+
+    .ribbon {
+        position: absolute;
+        top: -16px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 11px;
+        height: 24px;
+        background: var(--gold-soft);
+        clip-path: polygon(0 0, 50% 32%, 100% 0, 100% 100%, 0 100%);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.35);
+    }
+
+    .grade-num {
+        font-family: 'Fraunces', serif;
+        font-weight: 700;
+        font-size: 2.6rem;
+        line-height: 1;
+        color: var(--gold-soft);
+        text-shadow: 0 1px 0 rgba(255,255,255,0.18), 0 -1px 1px rgba(0,0,0,0.45);
+        margin-top: 0.6rem;
+    }
+    .grade-caption {
+        font-size: 0.7rem;
+        letter-spacing: 0.03em;
+        color: rgba(243,236,221,0.65);
+        margin-top: 0.15rem;
+    }
+
+    .open-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--paper);
+        border-top: 1px solid rgba(243,236,221,0.2);
+        padding-top: 0.7rem;
+        width: 100%;
+        justify-content: center;
+    }
+    .open-cta svg { transition: transform 0.2s ease; }
+    .passbook:hover .open-cta svg { transform: translateX(3px); }
+
+    .footnote {
+        margin-top: 3rem;
+        font-size: 0.78rem;
+        color: rgba(243,236,221,0.4);
+    }
+
+    @media (max-width: 640px) {
+        h1 { font-size: 1.25rem; }
+        .subtitle {
+            max-width: none;
+            font-size: 1.35rem;
+            white-space: nowrap;
+        }
+        .shelf { gap: 1.1rem; }
+        .passbook { --tilt: 0deg !important; width: 30%; min-width: 108px; }
+        .grade-num { font-size: 2rem; }
+        .open-cta { font-size: 0.72rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .passbook { animation: none; opacity: 1; }
+    }
+
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 7, 4, 0.6);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        z-index: 50;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+        background: var(--paper);
+        color: var(--wood-dark);
+        border-radius: 10px;
+        padding: 1.75rem 1.75rem 1.5rem;
+        max-width: 320px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 30px 60px -20px rgba(0,0,0,0.6);
+    }
+    .modal-box p {
+        font-family: 'Fraunces', serif;
+        font-weight: 600;
+        font-size: 1.15rem;
+        margin: 0 0 1.4rem;
+    }
+    .modal-actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+    }
+    .modal-actions button {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9rem;
+        font-weight: 500;
+        padding: 0.55rem 1.3rem;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        cursor: pointer;
+    }
+    .btn-lanjut {
+        background: var(--forest);
+        color: var(--paper);
+    }
+    .btn-batal {
+        background: transparent;
+        color: var(--wood-dark);
+        border-color: rgba(36,26,19,0.25);
+    }
+</style>
+</head>
+<body>
+<div class="stage">
+    <h1>Tabungan Pelajar</h1>
+    <p class="subtitle">SMP Negeri 4 Majenang</p>
+
+    <div class="shelf">
+        <a href="#" class="passbook" data-key="kelas7" data-label="Kelas 7" aria-label="Buka Tabungan Kelas 7">
+            <div class="ribbon"></div>
+            <div>
+                <div class="grade-num">7</div>
+                <div class="grade-caption">Kelas VII</div>
+            </div>
+            <span class="open-cta">Buka
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+        </a>
+        <a href="#" class="passbook" data-key="kelas8" data-label="Kelas 8" aria-label="Buka Tabungan Kelas 8">
+            <div class="ribbon"></div>
+            <div>
+                <div class="grade-num">8</div>
+                <div class="grade-caption">Kelas VIII</div>
+            </div>
+            <span class="open-cta">Buka
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+        </a>
+        <a href="#" class="passbook" data-key="kelas9" data-label="Kelas 9" aria-label="Buka Tabungan Kelas 9">
+            <div class="ribbon"></div>
+            <div>
+                <div class="grade-num">9</div>
+                <div class="grade-caption">Kelas IX</div>
+            </div>
+            <span class="open-cta">Buka
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </span>
+        </a>
+    </div>
+</div>
+
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-box">
+        <p id="confirmText">Buka aplikasi ini?</p>
+        <div class="modal-actions">
+            <button class="btn-batal" id="btnBatal">Batal</button>
+            <button class="btn-lanjut" id="btnLanjut">Lanjut</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Isi 3 URL deploy Web App (Apps Script) masing-masing kelas di sini.
+    // Contoh: 'https://script.google.com/macros/s/AKfycb.../exec'
+    const CONFIG = {
+        urls: {
+            kelas7: './tabungan7/',
+            kelas8: './tabungan8/',
+            kelas9: './tabungan9/'
+        }
+    };
+
+    const modal = document.getElementById('confirmModal');
+    const confirmText = document.getElementById('confirmText');
+    const btnLanjut = document.getElementById('btnLanjut');
+    const btnBatal = document.getElementById('btnBatal');
+    let pendingUrl = null;
+
+    function openModal(label, url) {
+        confirmText.textContent = 'Buka Tabungan ' + label + '?';
+        pendingUrl = url;
+        modal.classList.add('open');
+    }
+    function closeModal() {
+        modal.classList.remove('open');
+        pendingUrl = null;
+    }
+    btnLanjut.addEventListener('click', () => {
+        if (pendingUrl) window.open(pendingUrl, '_blank', 'noopener');
+        rememberConfirmed();
+        closeModal();
+    });
+    btnBatal.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+    const CONFIRM_KEY = 'tabunganPelajarConfirmed';
+    function hasConfirmedBefore() {
+        try { return localStorage.getItem(CONFIRM_KEY) === '1'; } catch (e) { return false; }
+    }
+    function rememberConfirmed() {
+        try { localStorage.setItem(CONFIRM_KEY, '1'); } catch (e) {}
+    }
+
+    document.querySelectorAll('.passbook').forEach((card) => {
+        card.removeAttribute('href');
+        const url = CONFIG.urls[card.dataset.key];
+        const isFilled = url && !url.startsWith('GANTI_DENGAN_URL');
+        card.addEventListener('animationend', (event) => {
+            if (event.animationName === 'settle') card.classList.add('is-floating');
+        });
+        card.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!isFilled) {
+                alert('URL aplikasi ' + card.dataset.label + ' belum diisi.\nEdit bagian CONFIG.urls di file ini untuk menautkannya.');
+                return;
+            }
+            if (hasConfirmedBefore()) {
+                window.open(url, '_blank', 'noopener');
+            } else {
+                openModal(card.dataset.label, url);
+            }
+        });
+    });
+</script>
+</body>
+</html>
