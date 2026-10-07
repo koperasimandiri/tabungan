@@ -1,0 +1,13 @@
+services:
+  tabungan:
+    build: .
+    container_name: tabungan-dev
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8087:80"
+    networks:
+      - hasanNet
+
+networks:
+  hasanNet:
+    external: true
