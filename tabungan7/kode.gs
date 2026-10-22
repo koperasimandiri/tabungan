@@ -61,6 +61,15 @@ function createUser(norek, nis, nama, role, kelas) {
   return { success: true, message: 'User berhasil dibuat.' };
 }
 
+function createManualUser_(actor, payload) {
+  const norek = String(payload.norek || '').trim();
+  const nis = String(payload.nis || '').trim();
+  const nama = String(payload.nama || '').trim();
+  const kelas = String(payload.kelas || '-').trim();
+  if (!norek || !nis || !nama || !kelas) throw new Error('Nomor rekening, NIS, nama, dan kelas wajib diisi.');
+  return createUser(norek, nis, nama, 'siswa', kelas);
+}
+
 // Jalankan fungsi ini dari tombol Run untuk membuat admin awal.
 function createInitialAdmin() {
   const norek = 'ADM001';
@@ -240,6 +249,7 @@ function route_(payload) {
     case 'getTransaksi': return getTransactions_(requireUser_(payload));
     case 'getAllRekap': return getAdminRecap_(requireAdmin_(payload));
     case 'bulkCreateUsers': return bulkCreateUsers_(requireAdmin_(payload), payload.users);
+    case 'createManualUser': return createManualUser_(requireAdmin_(payload), payload);
     case 'bulkCreateTransactions': return bulkCreateTransactions_(requireAdmin_(payload), payload.transactions);
     case 'createTransaksi': return createTransaction_(requireUser_(payload), payload);
     case 'getDropdownData': return getDropdownData_(requireUser_(payload));

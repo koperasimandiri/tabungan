@@ -271,6 +271,17 @@
             <button type="button" id="importMembersButton" onclick="importMembers()" class="hidden w-full mt-3 bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 transition font-black">Impor Anggota</button>
         </div>
 
+        <div id="manualMemberBox" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mt-6">
+            <h4 class="font-black text-lg text-slate-900 mb-4">Tambah Anggota Manual</h4>
+            <div class="space-y-3">
+                <input id="manualNorek" type="text" placeholder="Nomor Rekening" class="standard-input" style="padding-left: 1rem;">
+                <input id="manualNis" type="text" placeholder="NIS (password awal)" class="standard-input" style="padding-left: 1rem;">
+                <input id="manualNama" type="text" placeholder="Nama Lengkap" class="standard-input" style="padding-left: 1rem;">
+                <input id="manualKelas" type="text" placeholder="Kelas, contoh: 8A" class="standard-input" style="padding-left: 1rem;">
+                <button type="button" onclick="createManualMember()" class="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition font-black">Simpan Anggota</button>
+            </div>
+        </div>
+
         <div id="bulkTransactionBox" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mt-6">
             <div class="flex items-center justify-between gap-3 mb-4">
                 <h4 class="font-black text-lg text-slate-900">Upload Transaksi</h4>
@@ -497,6 +508,7 @@
                 document.getElementById('navRekap').classList.remove('hidden');
                 document.getElementById('adminNorekInput').classList.remove('hidden');
                 document.getElementById('bulkImportBox').classList.remove('hidden');
+                document.getElementById('manualMemberBox').classList.remove('hidden');
                 document.getElementById('bulkTransactionBox').classList.remove('hidden');
                 switchPage('rekap');
             } else {
@@ -723,10 +735,34 @@
             return values;
         }
 
+        function parseDelimitedRecords(text) {
+            const records = [];
+            let record = '';
+            let quoted = false;
+            for (let i = 0; i < text.length; i += 1) {
+                const char = text[i];
+                if (char === '"' && text[i + 1] === '"' && quoted) {
+                    record += '""';
+                    i += 1;
+                } else if (char === '"') {
+                    quoted = !quoted;
+                    record += char;
+                } else if ((char === '\n' || char === '\r') && !quoted) {
+                    if (char === '\r' && text[i + 1] === '\n') i += 1;
+                    if (record.trim()) records.push(record);
+                    record = '';
+                } else {
+                    record += char;
+                }
+            }
+            if (record.trim()) records.push(record);
+            return records;
+        }
+
         async function readImportRows(file) {
             if (/\.csv$/i.test(file.name)) {
                 const text = (await file.text()).replace(/^\uFEFF/, '').trim();
-                const lines = text.split(/\r?\n/).filter(line => line.trim());
+                const lines = parseDelimitedRecords(text);
                 if (!lines.length) return [];
                 const separator = lines[0].includes('\t') ? '\t' : ',';
                 const headers = parseDelimitedLine(lines[0], separator).map(header => header.replace(/^\uFEFF/, '').trim());
@@ -796,6 +832,24 @@
             } finally {
                 toggleLoading(false);
             }
+        }
+
+        async function createManualMember() {
+            const payload = {
+                action: 'createManualUser',
+                norek: document.getElementById('manualNorek').value.trim(),
+                nis: document.getElementById('manualNis').value.trim(),
+                nama: document.getElementById('manualNama').value.trim(),
+                kelas: document.getElementById('manualKelas').value.trim()
+            };
+            if (!payload.norek || !payload.nis || !payload.nama || !payload.kelas) return alert('Lengkapi semua data anggota.');
+            toggleLoading(true);
+            try {
+                await apiRequest(payload);
+                alert('Anggota berhasil ditambahkan. Password awal menggunakan NIS.');
+                ['manualNorek', 'manualNis', 'manualNama', 'manualKelas'].forEach(id => document.getElementById(id).value = '');
+            } catch (error) { alert(error.message || 'Gagal menambahkan anggota.'); }
+            finally { toggleLoading(false); }
         }
 
         function downloadTransactionTemplate() {
